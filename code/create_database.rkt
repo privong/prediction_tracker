@@ -11,6 +11,7 @@
   (define conn (sqlite3-connect #:database dbloc
                                 #:mode 'create))
   (query-exec conn "CREATE TABLE proposals (ID INTEGER NOT NULL,
+date TEXT NOT NULL,
 prediction TEXT NOT NULL,
 categories TEXT DEFAULT '',
 forecast float,
