@@ -9,7 +9,9 @@
 (check-equal? (brier-score 1 1) 0 "Perfect prediction, event occurs")
 
 ; wrong prediction, event occurs
-(check-equal? (brier-score 1 0) 1 "Predicted impossible, event occurs")
+(check-equal? (brier-score 0 1) 1 "Predicted impossible, event occurs")
+; wrong prediction, event doesn't occur
+(check-equal? (brier-score 1 0) 1 "Predicted to happen, event doesn't happen")
 
 ; 50/50 scores
 (check-equal? (brier-score 0.5 1) 0.25 "50/50 prediction, event occurs")
