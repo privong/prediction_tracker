@@ -4,7 +4,8 @@ Tools to maintain and interograte a database of predictions and results.
 
 ## Usage
 
-*TBD*
+Before using, copy `config.rkt.example` to `config.rkt` and edit it with your desired database location.
+Then run `create_database.rkt` to create the sqlite3 file and create the `predictions` table.
 
 ## Requirements
 
