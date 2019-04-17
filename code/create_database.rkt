@@ -14,8 +14,8 @@
 date TEXT NOT NULL,
 prediction TEXT NOT NULL,
 categories TEXT DEFAULT '',
-forecast float,
-outcome int,
+forecast float DEFAULT NULL,
+outcome int DEFAULT NULL,
 comments TEXT DEFAULT '')")
   (disconnect conn)
   (write-string (string-append "Database created at " dbloc "\n")))
