@@ -10,7 +10,7 @@
   (write-string (string-append "Creating database " dbloc "\n"))
   (define conn (sqlite3-connect #:database dbloc
                                 #:mode 'create))
-  (query-exec conn "CREATE TABLE proposals (ID INTEGER NOT NULL,
+  (query-exec conn "CREATE TABLE predictions (ID INTEGER NOT NULL,
 date TEXT NOT NULL,
 prediction TEXT NOT NULL,
 categories TEXT DEFAULT '',
@@ -27,7 +27,7 @@ comments TEXT DEFAULT '')")
 (cond (not (sqlite3-available?))
       (error "Sqlite3 library not available."))
 
-; create the database and add the `proposals` table if it doesn't exist
+; create the database and add the `predictions` table if it doesn't exist
 (if (not (file-exists? dbloc))
     (createdb dbloc)
     (write-string "Database exists. Exiting."))
