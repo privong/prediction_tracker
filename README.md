@@ -1,15 +1,15 @@
 # Prediction Tracker
 
-Tools to maintain and interograte a database of predictions and results.
+Tools to maintain and interrogate a database of predictions and results.
 
 ## Usage
 
 Before using, copy `config.rkt.example` to `config.rkt` and edit it with your desired database location.
 Then run `create_database.rkt` to create the sqlite3 file and create the `predictions` table.
 
-`update_predictions.rkt help` will provide instructions on how to add/update predictions, log outcomes, and compute Brier scores for those predictions.
-Note that functionality is currently limited to adding new predictions and showing open predictions.
-Updating predictions, logging outcomes, and scoring are not yet available.
+`update_predictions.rkt help` will provide instructions on how to add/update predictions and log outcomes. 
+[Brier scores](https://en.wikipedia.org/wiki/Brier_score) are currently computed when outcomes are entered.
+More comprehensive Brier score reporting will be developed in the figure (score as a function of time, average Brier scores, etc.).
 
 ## Requirements
 
