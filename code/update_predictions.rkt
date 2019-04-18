@@ -62,12 +62,20 @@
                         ID)))
 
 ; print a prediction without a known outcome
-; TODO: beautify output, add latest prediction to the output
 (define (printpred ID)
   (cond
-    [(not (knownoutcome? ID)) (print (query-row conn "SELECT ID, prediction FROM predictions where ID=? ORDER BY date ASC LIMIT 1"
-                                  ID))])
-  (display "\n")) ; TODO: need to remove this newline because it prints even if the outcome is known
+    [(not (knownoutcome? ID)) (write-string ((λ (myID)
+                                              (define prediction (query-value conn "SELECT prediction FROM predictions WHERE ID=? ORDER BY date ASC LIMIT 1" myID))
+                                              (define latest (query-row conn "SELECT date, forecast FROM predictions WHERE ID=? ORDER BY date DESC LIMIT 1" myID))
+                                              (string-append (number->string myID)
+                                                              "("
+                                                              (vector-ref latest 0)
+                                                              ") "
+                                                              prediction
+                                                              ": "
+                                                              (number->string (vector-ref latest 1))
+                                                              "\n"))
+                                             ID))]))
 
 ; update a prediction
 (define (updatepred ID)
