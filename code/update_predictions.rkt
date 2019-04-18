@@ -88,8 +88,11 @@
 
 ; add a new forecast to an existing prediction
 (define (reviseprediction ID)
-  (pending)
-  )
+  (define newf (string->number (getinput "What is your new predction")))
+  (define newfdate (getinput "What is the date of the new prediction (YYYY-MM-DD)"))
+  (define comments (getinput "Comments on the new prediction"))
+  (query-exec conn "INSERT INTO predictions (ID, date, forecast, comments) values (?, ?, ?, ?)"
+              ID newfdate newf comments))
 
 ; enter an outcome
 (define (addoutcome ID)
