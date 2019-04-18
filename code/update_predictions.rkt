@@ -71,10 +71,28 @@
 
 ; update a prediction
 (define (updatepred ID)
-  (define option (getinput "Enter \"1\" to add an updated prediction or \"2\" to enter an outcome"))
-  (pending)
+  (define option (string->number (getinput "Enter \"1\" to add an updated prediction or \"2\" to enter an outcome")))
+  (cond
+    [(eq? option 1) (reviseprediction ID)]
+    [(eq? option 2) (addoutcome ID)])
   ;TODO: get new prediction or outcome and enter into db
   )
+
+; add a new forecast to an existing prediction
+(define (reviseprediction ID)
+  (pending)
+  )
+
+; enter an outcome
+(define (addoutcome ID)
+  (define outcome (string->number (getinput "What is the outcome (0 for didn't happen, 1 for happened)")))
+  (define outcomedate (getinput "What was the date of the outcome (YYYY-MM-DD)"))
+  (define comments (getinput "Comments on the outcome"))
+  (define prediction (query-value conn "SELECT prediction FROM predictions WHERE ID=? ORDER BY DATE DESC LIMIT 1" ID))
+  (cond
+    [(not (or (eq? outcome 0) (eq? outcome 1))) (error "Outcome must be 0 or 1.\n")])
+  (query-exec conn "INSERT INTO predictions (ID, date, prediction, outcome, comments) values (?, ?, ?, ?, ?)"
+              ID outcomedate prediction outcome comments))
 
 ; enter an outcome for a prediction
 (define (showoutcome)
