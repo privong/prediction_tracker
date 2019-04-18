@@ -16,7 +16,7 @@
                                 #:mode 'create))
   (query-exec conn "CREATE TABLE predictions (ID INTEGER NOT NULL,
 date TEXT NOT NULL,
-prediction TEXT NOT NULL,
+prediction TEXT DEFAULT NULL,
 categories TEXT DEFAULT '',
 forecast float DEFAULT NULL,
 outcome int DEFAULT NULL,

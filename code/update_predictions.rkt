@@ -65,9 +65,9 @@
 ; TODO: beautify output, add latest prediction to the output
 (define (printpred ID)
   (cond
-    [(not (knownoutcome? ID)) (print (query-row conn "SELECT ID, prediction FROM predictions where ID=? ORDER BY date DESC LIMIT 1"
+    [(not (knownoutcome? ID)) (print (query-row conn "SELECT ID, prediction FROM predictions where ID=? ORDER BY date ASC LIMIT 1"
                                   ID))])
-  (display "\n"))
+  (display "\n")) ; TODO: need to remove this newline because it prints even if the outcome is known
 
 ; update a prediction
 (define (updatepred ID)
@@ -88,11 +88,10 @@
   (define outcome (string->number (getinput "What is the outcome (0 for didn't happen, 1 for happened)")))
   (define outcomedate (getinput "What was the date of the outcome (YYYY-MM-DD)"))
   (define comments (getinput "Comments on the outcome"))
-  (define prediction (query-value conn "SELECT prediction FROM predictions WHERE ID=? ORDER BY DATE DESC LIMIT 1" ID))
   (cond
     [(not (or (eq? outcome 0) (eq? outcome 1))) (error "Outcome must be 0 or 1.\n")])
-  (query-exec conn "INSERT INTO predictions (ID, date, prediction, outcome, comments) values (?, ?, ?, ?, ?)"
-              ID outcomedate prediction outcome comments))
+  (query-exec conn "INSERT INTO predictions (ID, date, outcome, comments) values (?, ?, ?, ?, ?)"
+              ID outcomedate outcome comments))
 
 ; enter an outcome for a prediction
 (define (showoutcome)
