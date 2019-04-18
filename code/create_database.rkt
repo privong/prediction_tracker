@@ -3,7 +3,11 @@
 ;; This program creates a sqlite3 database and then creates an empty table
 ;; for predictions.
 
+(require racket/date)
 (require db)
+
+; give us the date in YYYY-MM-DD format
+(date-display-format 'iso-8601)
 
 ; create the database and create the table
 (define (createdb dbloc)
@@ -17,6 +21,9 @@ categories TEXT DEFAULT '',
 forecast float DEFAULT NULL,
 outcome int DEFAULT NULL,
 comments TEXT DEFAULT '')")
+  ; add a dummy entry
+  (query-exec conn "INSERT INTO predictions (ID, date, prediction, outcome) values (0, ?, \"\",0)"
+              (date->string (seconds->date (current-seconds))))
   (disconnect conn)
   (write-string (string-append "Database created at " dbloc "\n")))
 
