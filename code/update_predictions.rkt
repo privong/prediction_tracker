@@ -6,6 +6,8 @@
 (require racket/date)
 (require db)
 
+(require "brier_score.rkt")
+
 (define progname "update_predictions.rkt")
 
 ; load configuration file
@@ -96,13 +98,18 @@
 
 ; enter an outcome
 (define (addoutcome ID)
+  (define lastpred (query-value conn "SELECT forecast FROM predictions WHERE ID=? ORDER BY date DESC LIMIT 1" ID))
   (define outcome (string->number (getinput "What is the outcome (0 for didn't happen, 1 for happened)")))
   (define outcomedate (getinput "What was the date of the outcome (YYYY-MM-DD)"))
   (define comments (getinput "Comments on the outcome"))
   (cond
     [(not (or (eq? outcome 0) (eq? outcome 1))) (error "Outcome must be 0 or 1.\n")])
-  (query-exec conn "INSERT INTO predictions (ID, date, outcome, comments) values (?, ?, ?, ?, ?)"
-              ID outcomedate outcome comments))
+  (query-exec conn "INSERT INTO predictions (ID, date, outcome, comments) values (?, ?, ?, ?)"
+              ID outcomedate outcome comments)
+  (define bscore (brier-score lastpred outcome))
+  (write-string (string-append "Brier score of most recent forecast: "
+                               (number->string bscore)
+                               "\n.")))
 
 ; enter an outcome for a prediction
 (define (showoutcome)
