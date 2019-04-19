@@ -1,6 +1,6 @@
 #lang racket/base
-; brier_score_test.rkt
-; Unit tests for Brier score function
+; scoring_rules-test.rkt
+; Unit tests for Scoring Rules
 
 (require rackunit
          "../code/scoring_rules.rkt")
