@@ -6,7 +6,7 @@
 (require racket/date)
 (require db)
 
-(require "brier_score.rkt")
+(require "scoring_rules.rkt")
 
 (define progname "update_predictions.rkt")
 
