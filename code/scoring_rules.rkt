@@ -7,8 +7,6 @@
 (provide brier-score
          log-score)
 
-(require math)
-
 ; compute Brier score
 ; f - forecast probability, [0, 1]
 ; o - actual outcome, 0 or 1
