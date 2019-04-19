@@ -119,6 +119,7 @@
 (define (printopen)
   (define uIDs (query-list conn
                            "SELECT DISTINCT ID FROM predictions"))
+  (write-string "ID(DATE) PREDICTION: LATEST FORECAST\n")
   (map printpred uIDs))
 
 ; find unresolved predictions
