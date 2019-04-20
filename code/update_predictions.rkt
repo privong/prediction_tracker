@@ -4,6 +4,7 @@
 
 (require racket/cmdline)
 (require racket/date)
+(require racket/list)
 (require db)
 
 (require "scoring_rules.rkt")
@@ -34,6 +35,7 @@
   (write-string " add\t\t - add new prediction to database.\n")
   (write-string " update\t\t - update a prediction with results.\n")
   (write-string " list-open\t - Show all predictions that do not yet have outcomes.\n")
+  (write-string " list-closed\t - Show all predictions that have outcomes.\n")
   (write-string " score\t\t - Calculate and display Brier scores for predictions with logged outcomes.\n")
   (write-string " help\t\t - Show this help message.\n")
   (write-string "\nCopyright 2019 George C. Privon\n"))
@@ -63,21 +65,21 @@
                         "SELECT outcome FROM predictions WHERE ID=? ORDER BY DATE DESC LIMIT 1"
                         ID)))
 
-; print a prediction without a known outcome
+; print a prediction given an ID
 (define (printpred ID)
-  (cond
-    [(not (knownoutcome? ID)) (write-string ((λ (myID)
-                                              (define prediction (query-value conn "SELECT prediction FROM predictions WHERE ID=? ORDER BY date ASC LIMIT 1" myID))
-                                              (define latest (query-row conn "SELECT date, forecast FROM predictions WHERE ID=? ORDER BY date DESC LIMIT 1" myID))
-                                              (string-append (number->string myID)
-                                                              "("
-                                                              (vector-ref latest 0)
-                                                              ") "
-                                                              prediction
-                                                              ": "
-                                                              (number->string (vector-ref latest 1))
-                                                              "\n"))
-                                             ID))]))
+  ; write most recent forecast information
+  (write-string ((λ (myID)
+                   (define prediction (query-value conn "SELECT prediction FROM predictions WHERE ID=? ORDER BY date ASC LIMIT 1" myID))
+                   (define lastf (query-row conn "SELECT date, forecast FROM predictions WHERE ID=? AND forecast IS NOT NULL ORDER BY date DESC LIMIT 1" myID))
+                   (string-append (number->string myID)
+                                  "("
+                                  (vector-ref lastf 0)
+                                  ") "
+                                  prediction
+                                  ": "
+                                  (number->string (vector-ref lastf 1))))
+                 ID))
+  (write-string "\n"))
 
 ; update a prediction
 (define (updatepred ID)
@@ -115,9 +117,26 @@
 
 ; print open predictions
 (define (printopen)
-  (define uIDs (query-list conn
-                           "SELECT DISTINCT ID FROM predictions"))
+  ; get a list of all IDs
+  (define allIDs (query-list conn
+                             "SELECT DISTINCT ID FROM predictions"))
+  ; get list of resolved predictions
+  (define resIDs (query-list conn
+                             "SELECT DISTINCT ID FROM predictions WHERE outcome IS NOT NULL"))
+  ; remove out the IDs that are resolved, keeping only the open predictions
+  (define uIDs (filter-map (λ (testID)
+                (if (member testID resIDs) #f testID))
+              allIDs))
+
+  ; print a header and individual entry information
   (write-string "ID(DATE) PREDICTION: LATEST FORECAST\n")
+  (map printpred uIDs))
+
+; print resolved predictions
+(define (printres)
+  (define uIDs (query-list conn
+                           "SELECT DISTINCT ID FROM predictions WHERE outcome IS NOT NULL"))
+  (write-string "ID(DATE) PREDICTION: LAST FORECAST, OUTCOME, BRIER SCORE\n")
   (map printpred uIDs))
 
 ; find unresolved predictions
@@ -152,6 +171,7 @@
   [(regexp-match "add" mode) (addpred)]
   [(regexp-match "update" mode) (findpending)]
   [(regexp-match "list-open" mode) (printopen)]
+  [(regexp-match "list-closed" mode) (printres)]
   [(regexp-match "score" mode) (score)]
   [else (error(string-append "Unknown mode. Try " progname " help\n\n"))])
 
