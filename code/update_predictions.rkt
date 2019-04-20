@@ -26,6 +26,12 @@
               #:args ([updatetype "help"]) ; (add, update, outcome help)
               updatetype))
 
+; check a date, if blank return current date
+(define (verify-or-get-date datestr)
+  (if (regexp-match-exact? #px"\\d{4}-\\d{2}-\\d{2}" datestr)
+      datestr
+      (date->string (current-date))))
+
 ; print some help
 (define (printhelp)
   (write-string (string-append "Usage: "
@@ -55,12 +61,13 @@
         (+ 1 lastID)
         (+ 1 0)))
   (define prediction (getinput "Enter the prediction"))
-  (define fprob (getinput "What is your forecast probability? "))
+  (define fprob (getinput "Enter your forecast probability"))
   (define comments (getinput "Comments on the forecast"))
   (define categories (getinput "Enter any categories (comma-separated)"))
-  (define date (getinput "Enter the date of the forecast (YYYY-MM-DD)"))
+  (define date (getinput "Enter the date of the forecast (YYYY-MM-DD or leave blank to use today's date)"))
+  (define enterdate (verify-or-get-date date))
   (query-exec conn "INSERT INTO predictions (ID, date, prediction, forecast, comments, categories) values (?,?, ?, ?, ?, ?)"
-              nID date prediction fprob comments categories))
+              nID enterdate prediction fprob comments categories))
 
 ; print a prediction given an ID
 (define (printpred ID)
@@ -88,7 +95,8 @@
 ; add a new forecast to an existing prediction
 (define (reviseprediction ID)
   (define newf (string->number (getinput "What is your new predction")))
-  (define newfdate (getinput "What is the date of the new prediction (YYYY-MM-DD)"))
+  (define date (getinput "Enter the date of the outcome (YYYY-MM-DD or leave blank to use today's date)"))
+  (define newfdate (verify-or-get-date date))
   (define comments (getinput "Comments on the new prediction"))
   (query-exec conn "INSERT INTO predictions (ID, date, forecast, comments) values (?, ?, ?, ?)"
               ID newfdate newf comments))
@@ -97,7 +105,8 @@
 (define (addoutcome ID)
   (define lastpred (query-value conn "SELECT forecast FROM predictions WHERE ID=? ORDER BY date DESC LIMIT 1" ID))
   (define outcome (string->number (getinput "What is the outcome (0 for didn't happen, 1 for happened)")))
-  (define outcomedate (getinput "What was the date of the outcome (YYYY-MM-DD)"))
+  (define date (getinput "Enter the date of the outcome (YYYY-MM-DD or leave blank to use today's date)"))
+  (define outcomedate (verify-or-get-date date))
   (define comments (getinput "Comments on the outcome"))
   (cond
     [(not (or (eq? outcome 0) (eq? outcome 1))) (error "Outcome must be 0 or 1.\n")])
