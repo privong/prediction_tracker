@@ -59,12 +59,6 @@
   (query-exec conn "INSERT INTO predictions (ID, date, prediction, forecast, comments, categories) values (?,?, ?, ?, ?, ?)"
               nID date prediction fprob comments categories))
 
-; is the outcome of a specified prediction known?
-(define (knownoutcome? ID)
-  (number? (query-value conn
-                        "SELECT outcome FROM predictions WHERE ID=? ORDER BY DATE DESC LIMIT 1"
-                        ID)))
-
 ; print a prediction given an ID
 (define (printpred ID)
   ; write most recent forecast information
@@ -110,10 +104,6 @@
   (write-string (string-append "Brier score of most recent forecast: "
                                (number->string bscore)
                                "\n.")))
-
-; enter an outcome for a prediction
-(define (showoutcome)
-  (pending))
 
 ; print open predictions
 (define (printopen)
