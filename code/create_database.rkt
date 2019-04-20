@@ -21,9 +21,6 @@ categories TEXT DEFAULT '',
 forecast float DEFAULT NULL,
 outcome int DEFAULT NULL,
 comments TEXT DEFAULT '')")
-  ; add a dummy entry
-  (query-exec conn "INSERT INTO predictions (ID, date, prediction, outcome) values (0, ?, \"\",0)"
-              (date->string (seconds->date (current-seconds))))
   (disconnect conn)
   (write-string (string-append "Database created at " dbloc "\n")))
 

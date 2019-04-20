@@ -49,8 +49,11 @@
 ; add a new prediction
 (define (addpred)
   ; manually get incremented ID
-  (define nID (+ 1
-                (query-value conn "SELECT ID FROM predictions order by ID desc limit 1")))
+  (define lastID (query-maybe-value conn "SELECT ID FROM predictions ORDER BY ID DESC LIMIT 1"))
+  (define nID
+    (if lastID
+        (+ 1 lastID)
+        (+ 1 0)))
   (define prediction (getinput "Enter the prediction"))
   (define fprob (getinput "What is your forecast probability? "))
   (define comments (getinput "Comments on the forecast"))
