@@ -84,9 +84,7 @@
   (define option (string->number (getinput "Enter \"1\" to add an updated prediction or \"2\" to enter an outcome")))
   (cond
     [(eq? option 1) (reviseprediction ID)]
-    [(eq? option 2) (addoutcome ID)])
-  ;TODO: get new prediction or outcome and enter into db
-  )
+    [(eq? option 2) (addoutcome ID)]))
 
 ; add a new forecast to an existing prediction
 (define (reviseprediction ID)
@@ -133,6 +131,12 @@
 
 ; compute Brier score for all predictions with outcomes
 (define (score)
+  (define uIDs (query-list conn
+                           "SELECT DISTINCT ID FROM predictions WHERE outcome IS NOT NULL"))
+  ; mapping across uIDs:
+  ;  - get list of all forecasts for this prediction
+  ;  - compute Brier score for all forecasts (relative to outcome)
+  ;  - write out
   (pending)
   )
 ; make sure we can use the sqlite3 connection
