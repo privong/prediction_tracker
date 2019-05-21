@@ -2,10 +2,10 @@
 
 ; Add new predictions, update predictions, add outcomes
 
-(require racket/cmdline)
-(require racket/date)
-(require racket/list)
-(require db)
+(require racket/cmdline
+         racket/date
+         racket/list
+         db)
 
 (require "scoring_rules.rkt")
 

@@ -3,8 +3,8 @@
 ;; This program creates a sqlite3 database and then creates an empty table
 ;; for predictions.
 
-(require racket/date)
-(require db)
+(require racket/date
+         db)
 
 ; give us the date in YYYY-MM-DD format
 (date-display-format 'iso-8601)
