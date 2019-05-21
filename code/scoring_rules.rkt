@@ -1,4 +1,4 @@
-#lang racket/base
+#lang typed/racket/base
 ; scoring_rules.rkt
 ;
 ; Compute scores for probabilistic predictions
@@ -10,13 +10,12 @@
 ; compute Brier score
 ; f - forecast probability, [0, 1]
 ; o - actual outcome, 0 or 1
+(: brier-score (-> Number Number Number))
 (define (brier-score f o)
     (expt (- f o) 2))
 
 ; compute logarithmic score
 ; L(r,i) = ln(r_i)
+(: log-score (-> Number Number Number))
 (define (log-score f o)
-    (cond
-        [(eq? o 1) (log f)]
-        [(eq? o 0) (log (- 1 f))]))
-
+  (+ (* o (log f)) (* (- 1 o) (log (- 1 f)))))
