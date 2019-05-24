@@ -17,6 +17,7 @@
 ; give us the date in YYYY-MM-DD format
 (date-display-format 'iso-8601)
 
+; placeholder to note that a particular functionality is not yet available
 (define (pending)
   (write-string "Functionality not yet implemented.\n"))
 
@@ -125,10 +126,10 @@
   ; get list of resolved predictions
   (define resIDs (query-list conn
                              "SELECT DISTINCT ID FROM predictions WHERE outcome IS NOT NULL"))
-  ; remove out the IDs that are resolved, keeping only the open predictions
+  ; remove the IDs that are resolved, keeping only the open predictions
   (define uIDs (filter-map (λ (testID)
-                (if (member testID resIDs) #f testID))
-              allIDs))
+                             (if (member testID resIDs) #f testID))
+                           allIDs))
 
   ; print a header and individual entry information
   (write-string "ID(DATE) PREDICTION: LATEST FORECAST\n")
