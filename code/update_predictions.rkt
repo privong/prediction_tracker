@@ -96,7 +96,7 @@
 ; add a new forecast to an existing prediction
 (define (reviseprediction ID)
   (define newf (string->number (getinput "What is your new predction")))
-  (define date (getinput "Enter the date of the outcome (YYYY-MM-DD or leave blank to use today's date)"))
+  (define date (getinput "Enter the date of the updated prediction (YYYY-MM-DD or leave blank to use today's date)"))
   (define newfdate (verify-or-get-date date))
   (define comments (getinput "Comments on the new prediction"))
   (query-exec conn "INSERT INTO predictions (ID, date, forecast, comments) values (?, ?, ?, ?)"
