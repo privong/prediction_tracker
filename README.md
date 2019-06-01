@@ -9,7 +9,7 @@ Then run `racket create_database.rkt` to create the sqlite3 file and create the 
 
 `racket update_predictions.rkt help` will provide instructions on how to add/update predictions and log outcomes. 
 [Brier scores](https://en.wikipedia.org/wiki/Brier_score) are currently computed when outcomes are entered.
-More comprehensive Brier score reporting will be developed in the figure (score as a function of time, average Brier scores, etc.).
+More comprehensive Brier score reporting will be developed in the future (score as a function of time, average Brier scores, etc.).
 
 ## Requirements
 
