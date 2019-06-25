@@ -17,10 +17,6 @@
 ; give us the date in YYYY-MM-DD format
 (date-display-format 'iso-8601)
 
-; placeholder to note that a particular functionality is not yet available
-(define (pending)
-  (write-string "Functionality not yet implemented.\n"))
-
 ; set up command line arguments
 (define mode (command-line
               #:program "update_prediction"
@@ -151,16 +147,31 @@
     [(string->number upID) (updatepred (string->number upID))]
     [else (exit)]))
 
-; compute Brier score for all predictions with outcomes
+; compute and print Brier score for all predictions with outcomes
 (define (score)
+  (write-string "Computing Brier Scores for all completed predictions.\n")
   (define uIDs (query-list conn
-                           "SELECT DISTINCT ID FROM predictions WHERE outcome IS NOT NULL"))
-  ; mapping across uIDs:
-  ;  - get list of all forecasts for this prediction
-  ;  - compute Brier score for all forecasts (relative to outcome)
-  ;  - write out
-  (pending)
-  )
+                           "SELECT DISTINCT ID FROM predictions WHERE outcome IS NOT NULL ORDER BY ID"))
+
+  (map (λ (uID)
+         (define pred (query-value conn
+                                   "SELECT prediction FROM predictions WHERE ID=? AND prediction IS NOT NULL"
+                                   uID))
+         (define fcast (query-value conn
+                                    "SELECT forecast FROM predictions WHERE ID=? AND forecast IS NOT NULL ORDER BY date DESC LIMIT 1"
+                                    uID))
+         (define ocome (query-value conn
+                                    "SELECT outcome FROM predictions WHERE ID=?AND outcome IS NOT NULL ORDER BY date DESC LIMIT 1"
+                                    uID))
+         (define bscore (brier-score fcast ocome))
+         (write-string (string-append pred
+                                      " Outcome: "
+                                      (number->string ocome)
+                                      ". Score: "
+                                      (number->string bscore)
+                                      "\n")))
+       uIDs))
+
 ; make sure we can use the sqlite3 connection
 (cond (not (sqlite3-available?))
     (error "Sqlite3 library not available."))
