@@ -20,7 +20,7 @@
 ; set up command line arguments
 (define mode (command-line
               #:program "update_prediction"
-              #:args ([updatetype "help"]) ; (add, update, outcome help)
+              #:args ([updatetype "help"]) ; (add, update, list-open, list-closed, score, help)
               updatetype))
 
 ; check a date, if blank return current date
