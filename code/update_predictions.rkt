@@ -86,10 +86,10 @@
     [score (display ((λ (myID)
                        (define outcome (query-value conn "SELECT outcome FROM predictions WHERE ID=? AND outcome IS NOT NULL LIMIT 1" myID))
                        (define lastf (query-value conn "SELECT forecast FROM predictions WHERE ID=? AND forecast IS NOT NULL ORDER BY date DESC LIMIT 1" myID))
-                       (string-append " "
+                       (string-append ", "
                                       (number->string outcome)
-                                      " "
-                                      (number->string (brier-score lastf outcome))))
+                                      ", "
+                                      (real->decimal-string (brier-score lastf outcome) 3)))
                      ID))])
   (newline))
 
@@ -127,7 +127,7 @@
               ID outcomedate outcome comments)
   (define bscore (brier-score lastpred outcome))
   (displayln (string-append "Brier score of most recent forecast: "
-                               (number->string bscore))))
+                               (real->decimal-string bscore 3))))
 
 ; print open predictions
 (define (printopen)
