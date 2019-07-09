@@ -67,8 +67,8 @@
   (query-exec conn "INSERT INTO predictions (ID, date, prediction, forecast, comments, categories) values (?,?, ?, ?, ?, ?)"
               nID enterdate prediction fprob comments categories))
 
-; print a prediction given an ID
-(define (printpred ID)
+; print a prediction given an ID. optionally write outcome and Brier score
+(define (printpred ID [score #f])
   ; print out information on a specific forecast
   ; if score is true, print out outcome (1 or 0) and Brier score
   (display ((λ (myID)
@@ -82,7 +82,21 @@
                            ": "
                            (number->string (vector-ref lastf 1))))
           ID))
+  (cond
+    [score (display ((λ (myID)
+                       (define outcome (query-value conn "SELECT outcome FROM predictions WHERE ID=? AND outcome IS NOT NULL LIMIT 1" myID))
+                       (define lastf (query-value conn "SELECT forecast FROM predictions WHERE ID=? AND forecast IS NOT NULL ORDER BY date DESC LIMIT 1" myID))
+                       (string-append " "
+                                      (number->string outcome)
+                                      " "
+                                      (number->string (brier-score lastf outcome))))
+                     ID))])
   (newline))
+
+(define (printpred-with-score ID)
+  (printpred ID #t))
+(define (printpred-without-score ID)
+  (printpred ID #f))
 
 ; update a prediction
 (define (updatepred ID)
@@ -130,14 +144,14 @@
 
   ; print a header and individual entry information
   (displayln "ID(DATE) PREDICTION: LATEST FORECAST")
-  (map printpred uIDs))
+  (map printpred-without-score uIDs))
 
 ; print resolved predictions
 (define (printres [score #f])
   (define uIDs (query-list conn
                            "SELECT DISTINCT ID FROM predictions WHERE outcome IS NOT NULL"))
   (displayln "ID(DATE) PREDICTION: LAST FORECAST, OUTCOME, BRIER SCORE")
-  (map printpred uIDs))
+  (map printpred-with-score uIDs))
 
 ; find unresolved predictions
 (define (findpending)
@@ -147,30 +161,6 @@
     [(eq? (string->number upID) 0) (exit)]
     [(string->number upID) (updatepred (string->number upID))]
     [else (exit)]))
-
-; compute and print Brier score for all predictions with outcomes
-(define (score)
-  (displayln "Computing Brier Scores for all completed predictions.")
-  (define uIDs (query-list conn
-                           "SELECT DISTINCT ID FROM predictions WHERE outcome IS NOT NULL ORDER BY ID"))
-
-  (map (λ (uID)
-         (define pred (query-value conn
-                                   "SELECT prediction FROM predictions WHERE ID=? AND prediction IS NOT NULL"
-                                   uID))
-         (define fcast (query-value conn
-                                    "SELECT forecast FROM predictions WHERE ID=? AND forecast IS NOT NULL ORDER BY date DESC LIMIT 1"
-                                    uID))
-         (define ocome (query-value conn
-                                    "SELECT outcome FROM predictions WHERE ID=?AND outcome IS NOT NULL ORDER BY date DESC LIMIT 1"
-                                    uID))
-         (define bscore (brier-score fcast ocome))
-         (displayln (string-append pred
-                                      " Outcome: "
-                                      (number->string ocome)
-                                      ". Score: "
-                                      (number->string bscore))))
-       uIDs))
 
 ; make sure we can use the sqlite3 connection
 (cond (not (sqlite3-available?))
@@ -186,7 +176,6 @@
   [(regexp-match "update" mode) (findpending)]
   [(regexp-match "list-open" mode) (printopen)]
   [(regexp-match "list-closed" mode) (printres)]
-  [(regexp-match "score" mode) (score)]
   [else (error (string-append "Unknown mode. Try " progname " help\n\n"))])
 
 ; close the databse
