@@ -20,7 +20,7 @@
 ; set up command line arguments
 (define mode (command-line
               #:program "update_prediction"
-              #:args ([updatetype "help"]) ; (add, update, list-open, list-closed, score, help)
+              #:args ([updatetype "help"]) ; (add, update, list-open, list-closed, help)
               updatetype))
 
 ; check a date, if blank return current date
@@ -40,7 +40,6 @@
   (displayln " update\t\t - update a prediction with results.")
   (displayln " list-open\t - Show all predictions that do not yet have outcomes.")
   (displayln " list-closed\t - Show all predictions that have outcomes.")
-  (displayln " score\t\t - Calculate and display Brier scores for predictions with logged outcomes.")
   (displayln " help\t\t - Show this help message.")
   (newline)
   (displayln "Copyright 2019 George C. Privon"))
