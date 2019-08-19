@@ -1,6 +1,6 @@
 # Prediction Tracker
 
-Tools to maintain and interrogate a database of predictions to track forecases and outcomes.
+Tools to maintain and interrogate a database of predictions to track forecasts and outcomes.
 
 ## Usage
 
