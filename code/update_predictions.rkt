@@ -37,12 +37,12 @@
   (newline)
   (displayln "Where MODE is one of:")
   (displayln " add\t\t - add new prediction to database.")
-  (displayln " update\t\t - update a prediction with results.")
+  (displayln " update\t\t - update a prediction with results or cancel a prediction.")
   (displayln " list-open\t - Show all predictions that do not yet have outcomes.")
   (displayln " list-closed\t - Show all predictions that have outcomes.")
   (displayln " help\t\t - Show this help message.")
   (newline)
-  (displayln "Copyright 2019 George C. Privon"))
+  (displayln "Copyright 2019-2020 George C. Privon"))
 
 ; set up a condensed prompt for getting information
 (define (getinput prompt)
@@ -116,17 +116,23 @@
 ; enter an outcome
 (define (addoutcome ID)
   (define lastpred (query-value conn "SELECT forecast FROM predictions WHERE ID=? ORDER BY date DESC LIMIT 1" ID))
-  (define outcome (string->number (getinput "What is the outcome (0 for didn't happen, 1 for happened)")))
+  (define outcome (string->number (getinput "What is the outcome (0 for didn't happen, 1 for happened, -1 to cancel prediction)")))
   (define date (getinput "Enter the date of the outcome (YYYY-MM-DD or leave blank to use today's date)"))
   (define outcomedate (verify-or-get-date date))
   (define comments (getinput "Comments on the outcome"))
   (cond
-    [(not (or (eq? outcome 0) (eq? outcome 1))) (error "Outcome must be 0 or 1.\n")])
+    [(not (or (eq? outcome 0)
+              (eq? outcome 1)
+              (eq? outcome -1))) (error "Outcome must be 0 or 1.\n")])
   (query-exec conn "INSERT INTO predictions (ID, date, outcome, comments) values (?, ?, ?, ?)"
               ID outcomedate outcome comments)
-  (define bscore (brier-score lastpred outcome))
-  (displayln (string-append "Brier score of most recent forecast: "
-                               (real->decimal-string bscore 3))))
+  ; only show Brier scores if there was an outcome
+  (cond
+    [(or (eq? outcome 0)
+              (eq? outcome 1))
+     (displayln (string-append "Brier score of most recent forecast: "
+                               (real->decimal-string (brier-score lastpred outcome) 3)))]))
+  
 
 ; print open predictions
 (define (printopen)
