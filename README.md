@@ -13,6 +13,6 @@ More comprehensive Brier score reporting will be developed in the future (score 
 
 ## Requirements
 
-* [Racket](https://racket-lang.org/) (tested with Racket 7.2-7.4)
+* [Racket](https://racket-lang.org/) (tested with Racket 7.2-7.5)
 * [`db` library](https://docs.racket-lang.org/db/index.html) and sqlite3 native library.
 
