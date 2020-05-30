@@ -146,10 +146,11 @@
   (define uIDs (filter-map (λ (testID)
                              (if (member testID resIDs) #f testID))
                            allIDs))
-
-  ; print a header and individual entry information
+  (cond
+    [(eq? (length uIDs) 0) (displayln "No open predictions.") ]
+    [else ; print a header and individual entry information
   (displayln "ID(DATE) PREDICTION: LATEST FORECAST")
-  (map printpred-without-score uIDs))
+  (map printpred-without-score uIDs)]))
 
 ; print resolved predictions
 (define (printres [score #f])
