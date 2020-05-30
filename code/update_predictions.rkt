@@ -71,16 +71,16 @@
   ; print out information on a specific forecast
   ; if score is true, print out outcome (1 or 0) and Brier score
   (display ((λ (myID)
-            (define prediction (query-value conn "SELECT prediction FROM predictions WHERE ID=? ORDER BY date ASC LIMIT 1" myID))
-            (define lastf (query-row conn "SELECT date, forecast FROM predictions WHERE ID=? AND forecast IS NOT NULL ORDER BY date DESC LIMIT 1" myID))
-            (string-append (number->string myID)
-                           "("
-                           (vector-ref lastf 0)
-                           ") "
-                           prediction
-                           ": "
-                           (number->string (vector-ref lastf 1))))
-          ID))
+              (define prediction (query-value conn "SELECT prediction FROM predictions WHERE ID=? ORDER BY date ASC LIMIT 1" myID))
+              (define lastf (query-row conn "SELECT date, forecast FROM predictions WHERE ID=? AND forecast IS NOT NULL ORDER BY date DESC LIMIT 1" myID))
+              (string-append (number->string myID)
+                             "("
+                             (vector-ref lastf 0)
+                             ") "
+                             prediction
+                             ": "
+                             (number->string (vector-ref lastf 1))))
+            ID))
   (cond
     [score (display ((λ (myID)
                        (define outcome (query-value conn "SELECT outcome FROM predictions WHERE ID=? AND outcome IS NOT NULL LIMIT 1" myID))
@@ -129,7 +129,7 @@
   ; only show Brier scores if there was an outcome
   (cond
     [(or (eq? outcome 0)
-              (eq? outcome 1))
+         (eq? outcome 1))
      (displayln (string-append "Brier score of most recent forecast: "
                                (real->decimal-string (brier-score lastpred outcome) 3)))]))
   
@@ -149,8 +149,8 @@
   (cond
     [(eq? (length uIDs) 0) (displayln "No open predictions.") ]
     [else ; print a header and individual entry information
-  (displayln "ID(DATE) PREDICTION: LATEST FORECAST")
-  (map printpred-without-score uIDs)]))
+     (displayln "ID(DATE) PREDICTION: LATEST FORECAST")
+     (map printpred-without-score uIDs)]))
 
 ; print resolved predictions
 (define (printres [score #f])
@@ -170,7 +170,7 @@
 
 ; make sure we can use the sqlite3 connection
 (cond (not (sqlite3-available?))
-    (error "Sqlite3 library not available."))
+      (error "Sqlite3 library not available."))
 
 ; open the database file
 (define conn (sqlite3-connect #:database dbloc))
